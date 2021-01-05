@@ -1,0 +1,68 @@
+version: "3"
+services:
+  redis:
+    container_name: auth_redis
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - postgres
+
+  postgres-service:
+    image: postgres:latest
+    container_name: auth_db # connection name in pg admin
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASS}
+      - POSTGRES_DB=${PG_DB}
+      - PGDATA=/data/postgres
+    ports:
+      - "5434:5432"
+    # volumes:
+      # - ./schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      # - ./data.sql:/docker-entrypoint-initdb.d/2-data.sql
+    networks:
+      - postgres
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PG_ADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PG_ADMIN_PASS}
+    depends_on:
+      - postgres-service
+    ports:
+      - "5051:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+  
+  # auth-service:
+  #   build: .
+  #   environment:
+  #     - PG_USER=${PG_USER}
+  #     - PG_PASS=${PG_PASS}
+  #     - PG_DB=${PG_DB}
+  #     - PG_HOST=auth_db
+  #     - PG_PORT=5432
+  #     - RATE_LIMIT=${RATE_LIMIT}
+  #     - JWT_SECRET=${JWT_SECRET}
+  #     - REFRESH_SECRET=${REFRESH_SECRET}
+  #     - REDIS_DSN=redis:6379
+  #   depends_on:
+  #     - postgres-service
+  #     - redis
+  #   ports:
+  #     - "5000:5000"
+  #   networks:
+  #     - postgres
+  #   restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+volumes:
+    pgadmin:

@@ -1,0 +1,17 @@
+  
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: go-msvc
+  labels:
+    app: auth-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: auth-service
+  ports:
+    - protocol: TCP
+      name: http
+      port: 80
+      targetPort: 5000
