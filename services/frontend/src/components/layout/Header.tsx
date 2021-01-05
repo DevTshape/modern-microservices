@@ -1,13 +1,16 @@
 import { Flex, Heading, Box, Button, Spacer } from "@chakra-ui/react";
 import ThemeToggle from "./ThemeToggle";
 import Link from 'next/link'
-import { logout } from "../../api/auth";
 
 interface Props {
   isAuthenticated: boolean;
+  logout: () => void;
 }
 
-const Header = ({isAuthenticated}: Props) => {
+const Header = ({
+  isAuthenticated, 
+  logout
+}: Props) => {
   
   return (
     <Flex>
@@ -17,16 +20,34 @@ const Header = ({isAuthenticated}: Props) => {
   </Link></Heading>
   </Box>
   <Spacer />
+  
+  <Link href="/products">
+    Products
+  </Link> 
+  {isAuthenticated ? 
+  <>
+  <Link href="/orders">
+    Orders
+  </Link> 
+  <Button colorScheme="teal" mr="4"
+    onClick={logout}
+  >
+    Log Out
+  </Button>
+  </>
+  : 
+  <>
   <Link href="/register">
     <Button colorScheme="teal" mr="4">
       Register
     </Button>
   </Link>
-  {isAuthenticated ? <Button colorScheme="teal" mr="4"
-    onClick={() => logout()}
-  >Log Out</Button> : <Link href="/login">
+
+  <Link href="/login">
     <Button colorScheme="teal" mr="4">Log in</Button>
-  </Link>}
+  </Link>
+  </>
+  }
   
     <ThemeToggle />
   <Box>
